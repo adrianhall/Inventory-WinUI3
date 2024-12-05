@@ -113,7 +113,6 @@ public class NavigationViewHeaderBehavior : Behavior<NavigationView>
             AssociatedObject.Header = (headerMode is NavigationViewHeaderMode.Never) ? null : GetHeaderContext(_currentPage) ?? DefaultHeader;
             AssociatedObject.HeaderTemplate = GetHeaderTemplate(_currentPage) ?? DefaultHeaderTemplate;
             AssociatedObject.AlwaysShowHeader = headerMode is NavigationViewHeaderMode.Always;
-
         }
     }
 }
