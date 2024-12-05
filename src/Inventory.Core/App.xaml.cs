@@ -49,7 +49,6 @@ public partial class App : Application
             {
                 // Activation
                 services.AddSingleton<IActivationService, ActivationService>();
-                services.AddTransient<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
 
                 // Navigation
                 services.AddSingleton<IViewMapper, ViewMapper>();

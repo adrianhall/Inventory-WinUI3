@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Inventory.Core.ViewModels;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -8,13 +9,10 @@ namespace Inventory.Core.Services;
 /// The concrete implementation of the <see cref="IActivationService"/>.  This is used
 /// during startup to activate the first view.
 /// </summary>
-public class ActivationService(
-    ActivationHandler<LaunchActivatedEventArgs> defaultHandler,
-    IEnumerable<IActivationHandler> activationHandlers,
-    Window window,
-    ILogger<ActivationService> logger
-    ) : IActivationService
+public class ActivationService(INavigationService navigationService, Window window, ILogger<ActivationService> logger) : IActivationService
 {
+    private static readonly Type DefaultViewModel = typeof(DashboardViewModel);
+
     #region IActivationService Implementation
     /// <summary>
     /// Activates the provided view with the provided arguments.
@@ -34,19 +32,16 @@ public class ActivationService(
         logger.LogTrace("Setting up main window content");
         window.Content ??= view ?? new Frame();
 
-        // Handle activation via the activation handlers.
-        logger.LogTrace("Handling activation");
-        foreach (var handler in activationHandlers.Where(handler => handler.CanHandle(activationArgs)))
+        // Handle activation.
+        if (activationArgs is LaunchActivatedEventArgs args)
         {
-            logger.LogTrace("Handling activation via {Handler}", handler.GetType().Name);
-            await handler.HandleAsync(activationArgs, cancellationToken);
+            logger.LogInformation("Activating launch event by navigating to default view '{viewType}'", DefaultViewModel.Name);
+            navigationService.Navigate(DefaultViewModel, args.Arguments);
         }
-
-        // Use the default activation handler.
-        if (defaultHandler.CanHandle(activationArgs))
+        else
         {
-            logger.LogTrace("Handling activation via {Handler}", defaultHandler.GetType().Name);
-            await defaultHandler.HandleAsync(activationArgs, cancellationToken);
+            logger.LogInformation("Activating unknown event by navigating to default view '{viewType}'", DefaultViewModel.Name);
+            navigationService.Navigate(DefaultViewModel);
         }
 
         // Activate the window
