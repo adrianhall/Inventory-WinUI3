@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModels="using:Inventory.Core.ViewModels"
+    xmlns:views="using:Inventory.Core.Views"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=viewModels:CustomersViewModel}">
 
@@ -16,9 +17,13 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
+        <!-- Title Block -->
         <TextBlock Text="{x:Bind ViewModel.Title, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" />
 
-        <!-- TODO: Customer List -->
+        <!-- Customer List -->
+        <Grid Grid.Row="1" Grid.RowSpan="{x:Bind ViewModel.RowSpan, Mode=OneWay}">
+            <views:CustomersList ViewModel="{x:Bind ViewModel.CustomerList}" />
+        </Grid>
 
         <!-- TODO: Customer Details -->
 

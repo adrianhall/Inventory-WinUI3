@@ -20,6 +20,9 @@ public partial class CustomersViewModel(CustomerListViewModel customerListViewMo
         get => $"Customers {CustomerList.Title}";
     }
 
+    [ObservableProperty]
+    private int _rowSpan = 1;
+
     #region INavigationLifecycle Implementation
     public void OnNavigatedFrom()
     {
