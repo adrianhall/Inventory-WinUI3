@@ -29,21 +29,15 @@ public partial class App : Application
             .UseContentRoot(AppContext.BaseDirectory)
             .ConfigureAppConfiguration((ctx, builder) =>
             {
-                builder.AddJsonFile("appsettings.json", optional: true);
+                builder.AddJsonFile("appsettings.json", optional: false);
                 builder.AddJsonFile($"appsettings.{ctx.HostingEnvironment.EnvironmentName}.json", optional: true);
                 builder.AddEnvironmentVariables();
             })
             .ConfigureLogging((ctx, builder) =>
             {
-                builder.AddConsole();
-                if (ctx.HostingEnvironment.IsDevelopment())
-                {
-                    builder.AddDebug();
-                }
-                else
-                {
-                    builder.AddEventLog(new EventLogSettings { SourceName = "Inventory", LogName = "Application" });
-                }
+                builder.AddConfiguration(ctx.Configuration.GetSection("Logging"));
+                builder.AddDebug();
+                builder.AddEventLog(new EventLogSettings { SourceName = "Inventory", LogName = "Application" });
             })
             .ConfigureServices((ctx, services) =>
             {
@@ -58,11 +52,14 @@ public partial class App : Application
                 services.AddSingleton<ShellView>();
 
                 // Services
+                services.AddTransient<IMappingService, MappingService>();
+                services.AddSingleton<IDataService, FakeDataService>();
 
                 // View Models
                 services.AddTransient<ShellViewModel>();
                 services.AddTransient<DashboardViewModel>();
                 services.AddTransient<CustomersViewModel>();
+                services.AddTransient<CustomerListViewModel>();
                 services.AddTransient<OrdersViewModel>();
                 services.AddTransient<ProductsViewModel>();
             })

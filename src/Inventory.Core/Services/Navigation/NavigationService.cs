@@ -59,11 +59,7 @@ public class NavigationService(IViewMapper viewMapper, Window window, ILogger<Na
             object? viewModelBeforeNavigation = _frame?.GetPageViewModel();
             logger.LogDebug("viewModelBeforeNavigation: {viewModelBeforeNavigation}", viewModelBeforeNavigation?.GetType().Name);
             _frame?.GoBack();
-            if (viewModelBeforeNavigation is INavigationLifecycle lifecycle)
-            {
-                logger.LogDebug("viewModel is INavigationLifecycle - calling OnNavigatedFrom()");
-                lifecycle.OnNavigatedFrom();
-            }
+            CallNavigationLifecycle(viewModelBeforeNavigation);
             return true;
         }
         return false;
@@ -91,11 +87,7 @@ public class NavigationService(IViewMapper viewMapper, Window window, ILogger<Na
             if (navigated)
             {
                 _lastParameterUsed = parameter;
-                if (viewModelBeforeNavigation is INavigationLifecycle lifecycle)
-                {
-                    logger.LogDebug("viewModel is INavigationLifecycle - calling OnNavigatedFrom()");
-                    lifecycle.OnNavigatedFrom();
-                }
+                CallNavigationLifecycle(viewModelBeforeNavigation);
             }
             return navigated;
         }
@@ -142,16 +134,47 @@ public class NavigationService(IViewMapper viewMapper, Window window, ILogger<Na
                 _frame?.BackStack.Clear();
             }
 
-            object? viewModel = _frame?.GetPageViewModel();
-            logger.LogDebug("viewmodel is {viewModel}", viewModel?.GetType().Name);
-            if (viewModel is INavigationLifecycle lifecycle)
-            {
-                logger.LogDebug("viewmodel is INavigationLifecycle - calling OnNavigatedTo()");
-                lifecycle.OnNavigatedTo();
-            }
-
             logger.LogDebug("Propagating navigation event");
             Navigated?.Invoke(sender, e);
+        }
+    }
+
+    /// <summary>
+    /// Calls the navigation lifecycle methods on the provided view model.
+    /// </summary>
+    /// <param name="viewModel">The view model to use.</param>
+    /// <param name="action">The action to call.</param>
+    private void CallNavigationLifecycle(object? previousViewModel)
+    {
+        logger.LogTrace("CallNavigationLifecycle()");
+
+        if (previousViewModel is not null)
+        {
+            logger.LogDebug("CallNavigationLifecycle(): previousViewModel is {previousViewModel}", previousViewModel.GetType().Name);
+            if (previousViewModel is INavigationLifecycle previousLifecycle)
+            {
+                logger.LogDebug("previousViewModel has INavigationLifecycle - calling OnNavigatedFrom()");
+                previousLifecycle.OnNavigatedFrom();
+            }
+            else
+            {
+                logger.LogDebug("previousViewModel does not have INavigationLifecycle");
+            }
+        }
+
+        object? currentViewModel = _frame?.GetPageViewModel();
+        if (currentViewModel is not null)
+        {
+            logger.LogDebug("CallNavigationLifecycle(): currentViewModel is {currentViewModel}", currentViewModel.GetType().Name);
+            if (currentViewModel is INavigationLifecycle currentLifecycle)
+            {
+                logger.LogDebug("currentViewModel has INavigationLifecycle - calling OnNavigatedTo()");
+                currentLifecycle.OnNavigatedTo();
+            }
+            else
+            {
+                logger.LogDebug("currentViewModel does not have INavigationLifecycle");
+            }
         }
     }
 }

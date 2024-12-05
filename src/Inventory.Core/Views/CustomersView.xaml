@@ -9,6 +9,19 @@
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=viewModels:CustomersViewModel}">
 
-    <TextBlock Text="{x:Bind ViewModel.MyText}" />
-    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="{x:Bind ViewModel.Title, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" />
+
+        <!-- TODO: Customer List -->
+
+        <!-- TODO: Customer Details -->
+
+    </Grid>
+
 </Page>
